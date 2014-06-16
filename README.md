@@ -3,25 +3,19 @@
 This tutorial was written in June 2014. It covers the version 1.0.0
 released on may 30, 2014.
 
-*The tutorial covers Spark setup on a new Ubuntu 14.04 x64 installation
-on a desktop :*
+*The tutorial covers Spark setup on a new Ubuntu 14.04 x64 virtual machine :*
 
 -   Linux prerequisites for Spark
 
 -   Spark build and installation
 
--   basic Spark configuration
+-   Spark configuration
 
 -   standalone cluster setup (one master and 3 slaves on a single
     machine)
 
--   running the `PI` approximation (in Scala) job with spark-shell
+-   execution of the `PI` approximation (in Scala) job with spark-shell
 
--   build and run `PiApp` (PI approximation in Scala) on a standalone
-    cluster
-
--   build and run `CountingApp` (counting words application in Scala) on
-    a standalone cluster
 
 ## Dev station setup
 
