@@ -65,10 +65,10 @@ For the most impatient, check the examples from the [documentation][] to
 see the simplicity to distribute computation with Scala, Java and Python
 APIs.
 
-## Corner stone : Resilient Distributed Dataset (RDD) \<= TODO
+## Corner stone : Resilient Distributed Dataset (RDD)
 
 *A few words about the Resilient Ditributed Dataset introduced in Spark
-core design. For the impatient : follow the link13.*
+core design.
 
 *A Resilient Ditributed Dataset is a collection distributed all over the
 Spark cluster. RDDs' main purpose is to support higher-level, parallel
