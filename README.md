@@ -53,7 +53,7 @@ Spark's slogan is "lightning-fast cluster computing" coming from the
 The conception and development started as a research project and turned
 into Apache incubator in june 2013. Graduated an Apache Top-Level
 Project in February 2014, this framework has a rapidly growing users and
-developers community [2][].
+developers community.
 
 Mainly written in Scala, Spark provides Scala, Java and Python APIs.
 Scala API provides a way to write concise, higher level routines that
