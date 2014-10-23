@@ -1,92 +1,642 @@
 <!doctype html>
-<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
-<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Start-spark by bbouille</title>
 
-  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen">
-  <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="javascripts/script.js"></script>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-  <title>Start-spark</title>
-  <meta name="description" content="How to setup Apache Spark">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Start-spark</h1>
+        <p>How to setup Apache Spark</p>
+        <p class="view"><a href="https://github.com/bbouille/start-spark">View the Project on GitHub <small>bbouille/start-spark</small></a></p>
+        <ul>
+          <li><a href="https://github.com/bbouille/start-spark/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/bbouille/start-spark/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/bbouille/start-spark">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="getting-started-with-spark" class="anchor" href="#getting-started-with-spark"><span class="octicon octicon-link"></span></a>Getting started with Spark</h1>
 
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+<p>This tutorial was written in June 2014. It covers the version 1.0.0
+released on may 30, 2014.</p>
 
-</head>
+<p><em>The tutorial covers Spark setup on a new Ubuntu 14.04 x64 virtual machine :</em></p>
 
-<body>
+<ul>
+<li><p>Linux prerequisites for Spark</p></li>
+<li><p>Spark build and installation</p></li>
+<li><p>Spark configuration</p></li>
+<li><p>standalone cluster setup (one master and 3 slaves on a single
+machine)</p></li>
+<li><p>execution of the <code>PI</code> approximation (in Scala) job with spark-shell</p></li>
+</ul>
 
-  <div class="wrapper">
-    <header>
-      <h1 class="title">Start-spark</h1>
-    </header>
-    <div id="container">
-      <p class="tagline">How to setup Apache Spark</p>
-      <div id="main" role="main">
-        <div class="download-bar">
-        <div class="inner">
-          <a href="https://github.com/bbouille/start-spark/tarball/master" class="download-button tar"><span>Download</span></a>
-          <a href="https://github.com/bbouille/start-spark/zipball/master" class="download-button zip"><span>Download</span></a>
-          <a href="https://github.com/bbouille/start-spark" class="code">View Start-spark on GitHub</a>
-        </div>
-        <span class="blc"></span><span class="trc"></span>
-        </div>
-        <article class="markdown-body">
-          <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<h2>
+<a name="dev-station-setup" class="anchor" href="#dev-station-setup"><span class="octicon octicon-link"></span></a>Dev station setup</h2>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p><em>Before installing Spark:</em></p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<ul>
+<li><p>Ubuntu 14.04 LTS amd64 (MD5 (ubuntu-14.04-desktop-amd64.iso) =
+dccff28314d9ae4ed262cfc6f35e5153) in a virtual machine (1 cpu / 2 Go
+RAM with Fusion on OSx)</p></li>
+<li><p>Python 2.7.3 (comming out of box)</p></li>
+</ul>
+
+<p>What we are going to install :</p>
+
+<ul>
+<li><p>Oracle JDK 1.7.0_60</p></li>
+<li><p>Scala 2.10.4</p></li>
+<li><p>Git 1.9.1</p></li>
+<li><p>Spark 1.0.0</p></li>
+<li><p>SSH server</p></li>
+</ul>
+
+<h2>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>Spark's slogan is "lightning-fast cluster computing" coming from the
+<a href="https://amplab.cs.berkeley.edu">AMPLab at UC Berkeley</a>.</p>
+
+<p>The conception and development started as a research project and turned
+into Apache incubator in june 2013. Graduated an Apache Top-Level
+Project in February 2014, this framework has a rapidly growing users and
+developers community.</p>
+
+<p>Mainly written in Scala, Spark provides Scala, Java and Python APIs.
+Scala API provides a way to write concise, higher level routines that
+effectively manipulate distributed data.</p>
+
+<h2>
+<a name="code-teasing" class="anchor" href="#code-teasing"><span class="octicon octicon-link"></span></a>Code teasing</h2>
+
+<p>For the most impatient, check the examples from the <a href="http://spark.apache.org/examples.html">documentation</a> to
+see the simplicity to distribute computation with Scala, Java and Python
+APIs.</p>
+
+<h2>
+<a name="corner-stone--resilient-distributed-dataset-rdd" class="anchor" href="#corner-stone--resilient-distributed-dataset-rdd"><span class="octicon octicon-link"></span></a>Corner stone : Resilient Distributed Dataset (RDD)</h2>
+
+<p>*A few words about the Resilient Ditributed Dataset introduced in Spark
+core design.</p>
+
+<p><em>A Resilient Ditributed Dataset is a collection distributed all over the
+Spark cluster. RDDs' main purpose is to support higher-level, parallel
+operations on data in a straightforward manner. There are currently two
+types of RDDs: parallelized collections, which take an existing Scala
+collection and run operations on it in parallel, and Hadoop datasets,
+which run functions on each record of a file in HDFS (or any other
+storage system supported by Hadoop).</em></p>
+
+<h2>
+<a name="requirements-on-the-environnement-os-side" class="anchor" href="#requirements-on-the-environnement-os-side"><span class="octicon octicon-link"></span></a>Requirements on the environnement (OS side)</h2>
+
+<p>The following setup follows steps for a 'fresh' Ubuntu installation.
+Meaning that it's the first run of my Ubuntu right now.</p>
+
+<h3>
+<a name="details-of-the-distribution" class="anchor" href="#details-of-the-distribution"><span class="octicon octicon-link"></span></a>Details of the distribution</h3>
+
+<pre><code>snoop@ubuntu:~$ uname -a 
+# should return:
+Linux ubuntu 3.13.0-23-generic #45-Ubuntu SMP Fri Apr 4 06:58:38 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+
+snoop@ubuntu:~$ lsb_release -a
+# should return:
+No LSB modules are available. 
+Distributor ID: Ubuntu 
+Description:    Ubuntu Trusty Tahr (development branch) 
+Release:    14.04 
+Codename:   trusty
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h3>
+<a name="install-java-7" class="anchor" href="#install-java-7"><span class="octicon octicon-link"></span></a>Install Java 7</h3>
+
+<p>Due to licence restrictions from Oracle, the sun JDK package is no
+longer available from Ubuntu repositories. Here is a little code snippet
+to download and install the Oracle JDK7.</p>
+
+<p><em>(optional) clean up OpenJDK if any version is on your Ubuntu station
+not freshly installed.</em></p>
+
+<pre><code>snoop@ubuntu:~$ sudo apt-get purge openjdk*
+</code></pre>
+
+<p>Prepare the Java7 installation, here is the <strong>~/java7.sh</strong> script, open
+an editor and add the following :</p>
+
+<pre><code>#!/bin/sh -Eux
+
+# Add a new repository a your sources lists
+echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu precise main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu precise main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
+
+# Update apt-get
+apt-get -y update
+echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+
+# First attempt to install the package
+apt-get -y install oracle-java7-installer
+
+# 'lost connection' happen all the time, a quick loop to ensure that network failure do not break the installation process
+while ! apt-get -y install oracle-java7-installer
+do
+    sleep 1
+done
+</code></pre>
+
+<p>Install Java7 (taking few minutes) with :</p>
+
+<pre><code>snoop@ubuntu:~$ chmod +x java7.sh
+snoop@ubuntu:~$ sudo ./java7.sh
+# should return:
+# [...] many outputs taking few minutes finishing by :
++ apt-get -y install oracle-java7-installer Reading package lists... Done Building dependency tree
+Reading state information... Done
+oracle-java7-installer is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 476 not upgraded
+</code></pre>
+
+<p>Check the JAVA path :</p>
+
+<pre><code>snoop@ubuntu:~$ file `which java`
+# should return:
+# /usr/bin/java: symbolic link to `/etc/alternatives/java'
+
+snoop@ubuntu:~$ file /etc/alternatives/java
+# should return:
+# /etc/alternatives/java: symbolic link to `/usr/lib/jvm/java-7-oracle/jre/bin/java'
+</code></pre>
+
+<p>And check the java version :</p>
+
+<pre><code>snoop@ubuntu:~$ java -version
+# should return:
+# java version "1.7.0_60" 
+# Java(TM) SE Runtime Environment (build 1.7.0_60-b19) 
+# Java HotSpot(TM) 64-Bit Server VM (build 24.60-b09, mixed mode)
+</code></pre>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<a name="set-java_home" class="anchor" href="#set-java_home"><span class="octicon octicon-link"></span></a>Set JAVA_HOME</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>Check the current \$JAVA_HOME value :</p>
+
+<pre><code>snoop@ubuntu:~$ echo $JAVA_HOME
+# should return: nothing
+</code></pre>
+
+<p>From the Java path checking, set the \$JAVA_HOME for the current user
+and load it :</p>
+
+<pre><code>snoop@ubuntu:~$ echo "JAVA_HOME=/usr/lib/jvm/java-7-oracle/" &gt;&gt; ~/.bashrc
+snoop@ubuntu:~$ source ~/.bashrc
+</code></pre>
+
+<p>Check the new \$JAVA_HOME value :</p>
+
+<pre><code>snoop@ubuntu:~$ echo $JAVA_HOME
+# should return:
+# /usr/lib/jvm/java-7-oracle/
+</code></pre>
+
+<p>Let’s do it for the whole system with sudo :</p>
+
+<pre><code>snoop@ubuntu:~$ sudo bash -c 'echo "JAVA_HOME=/usr/lib/jvm/java-7-oracle/" &gt;&gt; /etc/environment'
+</code></pre>
+
+<p>Having problems with Java setup? Check the <a href="https://help.ubuntu.com/community/Java#Oracle_Java_7">ubuntu Java 7
+documentation</a></p>
 
 <h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<a name="install-scala" class="anchor" href="#install-scala"><span class="octicon octicon-link"></span></a>Install Scala</h3>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>Spark 1.0.0 depends on Scala 2.10 and any version 2.10.x should be fine.</p>
+
+<p>So we are going to install the latest stable 2.10.4 package from the
+official page :</p>
+
+<pre><code>snoop@ubuntu:~$ wget http://www.scala-lang.org/files/archive/scala-2.10.4.deb
+</code></pre>
+
+<p>Install the <code>.deb</code> file :</p>
+
+<pre><code>snoop@ubuntu:~$ dpkg -i scala-2.10.4.deb
+</code></pre>
+
+<p>Check the version :</p>
+
+<pre><code>snoop@ubuntu:~$ scala -version 
+# should return:
+# Scala code runner version 2.10.4 -- Copyright 2002-2013, LAMP/EPFL
+</code></pre>
 
 <h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<a name="set-scala_home" class="anchor" href="#set-scala_home"><span class="octicon octicon-link"></span></a>Set SCALA_HOME</h3>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>Set the SCALA_HOME for the current user, load it and check the variable
+:</p>
+
+<pre><code>snoop@ubuntu:~$ echo "SCALA_HOME=/usr/share/java" &gt;&gt; ~/.bashrc
+snoop@ubuntu:~$ source ~/.bashrc
+snoop@ubuntu:~$ echo $SCALA_HOME
+# should return:
+# /usr/share/java
+</code></pre>
+
+<p>Don’t be afraid to set this path, the scala <code>jar</code> are there :</p>
+
+<pre><code>snoop@ubuntu:~$ ls -al /usr/share/java |grep scala
+</code></pre>
+
+<h2>
+<a name="install-spark" class="anchor" href="#install-spark"><span class="octicon octicon-link"></span></a>Install Spark</h2>
+
+<p>There are two options to install Spark :</p>
+
+<ul>
+<li>  Install an official build from the <a href="http://spark.apache.org/downloads.html">download page</a>.</li>
+</ul>
+
+<p>or</p>
+
+<ul>
+<li>  Build and install out own from the source.</li>
+</ul>
+
+<p>Since we need to use the monitoring metrics in Ganglia, we are going to
+build Spark and explicitly include ganglia (see more <a href="http://spark.apache.org/docs/latest/monitoring.html#metrics">here</a>)</p>
 
 <h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<a name="install-git" class="anchor" href="#install-git"><span class="octicon octicon-link"></span></a>Install git</h3>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-        </article>
-      </div>
+<p>With <code>apt-get</code> and <code>sudo</code> :</p>
+
+<pre><code>snoop@ubuntu:~$ sudo apt-get install git
+</code></pre>
+
+<h3>
+<a name="get-the-sources" class="anchor" href="#get-the-sources"><span class="octicon octicon-link"></span></a>Get the sources</h3>
+
+<p>Clone the git repository, go to the spark folder and checkout the
+version 1.0.0:</p>
+
+<pre><code>snoop@ubuntu:~$ git clone https://github.com/apache/spark.git
+snoop@ubuntu:~$ cd spark/
+snoop@ubuntu:~/spark$ git checkout v1.0.0
+# should return:
+Note: checking out 'v1.0.0'.
+[...]
+HEAD is now at 2f1dc86... [maven-release-plugin] prepare release v1.0.0-rc11
+</code></pre>
+
+<h3>
+<a name="build-spark" class="anchor" href="#build-spark"><span class="octicon octicon-link"></span></a>Build Spark</h3>
+
+<p>We are going to build Spark with <a href="http://www.scala-sbt.org/">sbt</a>, a build tool for Scala and
+Java, provided in the sources.</p>
+
+<p>Our Spark build will include two additional features as build options :</p>
+
+<ul>
+<li><p>Hadoop 2.2.0 support instead of Hadoop 1.0.4 using
+<code>SPARK_HADOOP_VERSION=2.2.0</code></p></li>
+<li><p>Ganglia sink for monitoring using <code>SPARK_GANGLIA_LGPL=true</code></p></li>
+</ul>
+
+<p>To build Spark with Ganglia and Hadoop 2.2.0, set the environment
+variables in the command line and run the <code>sbt assembly</code> command :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ SPARK_GANGLIA_LGPL=true SPARK_HADOOP_VERSION=2.2.0 ./sbt/sbt assembly
+# should return:
+# [info] Checking every .class/.jar file's SHA-1. 
+[info] SHA-1: da9d2faea382a681d15457e9b01cc96940b6872f 
+[info] Packaging /home/snoop/spark/examples/target/scala-2.10/spark-examples-1.0.0-hadoop2.2.0.jar ... 
+[info] Done packaging. 
+[success] Total time: 2103 s, completed Jun 15, 2014 2:38:25 PM
+</code></pre>
+
+<p>Once it’s done, the easiest way to use Spark is to run the shell (local
+instance) :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ ./bin/spark-shell
+# should return:
+14/06/16 00:33:25 INFO SparkILoop: Created spark context.. 
+Spark context available as sc.
+scala&gt;
+</code></pre>
+
+<p>Some logs are printed in the console for the moment and no error should
+happen. Quit the shell with 'ctrl + d'.</p>
+
+<h2>
+<a name="run-spark-in-standalone-mode" class="anchor" href="#run-spark-in-standalone-mode"><span class="octicon octicon-link"></span></a>Run Spark in standalone mode</h2>
+
+<p>After a successful build, it’s time to play (a bit) with Spark in
+standalone mode. In this mode, a master AND several slaves run as
+seperate JVM on localhost to simulate a cluster behavior.</p>
+
+<h3>
+<a name="set-the-environnement-spark-side" class="anchor" href="#set-the-environnement-spark-side"><span class="octicon octicon-link"></span></a>Set the environnement (Spark side)</h3>
+
+<p>Several steps are required before running Spark smoothly in this mode :</p>
+
+<ol>
+<li><p>Set up SSH and enable connection without password from localhost to
+localhost for the current user ;</p></li>
+<li><p>Set the file <code>/conf/spark-env.sh</code> from the template and define the
+number of workers (slaves in JVM).</p></li>
+<li><p>Set the <code>/etc/hosts</code> with the IP address of eth0 associated to the
+<code>hostname</code></p></li>
+<li><p>Set a nicer logger format with log4j to a file</p></li>
+</ol>
+
+<p><strong>Set up and enable SSH connections</strong></p>
+
+<ul>
+<li>  Install and start SSH server with this command :</li>
+</ul>
+
+
+
+<pre><code>snoop@ubuntu:~$ sudo apt-get -y install openssh-server
+</code></pre>
+
+<ul>
+<li>  Generate RSA keys for the current user with <code>ssh-keygen</code> and the
+option <code>-P ""</code> to set a blank password on the private key (BE
+CAREFULL: that disables private key password, do not use in a
+production environment without security measures) :</li>
+</ul>
+
+
+
+<pre><code>snoop@ubuntu:~$ ssh-keygen -P "" 
+# should return:
+# Generating public/private rsa key pair.
+Enter file in which to save the key (/home/snoop/.ssh/id_rsa): 
+Created directory '/home/snoop/.ssh'.
+Your identification has been saved in /home/snoop/.ssh/id_rsa.
+Your public key has been saved in /home/snoop/.ssh/id_rsa.pub.
+The key fingerprint is:
+db:68:50:07:55:13:6a:e6:15:21:74:10:3c:29:d2:d3 snoop@ubuntu
+The key's randomart image is:
++--[ RSA 2048]----+
+|              o+.|
+|             oo .|
+|            oo.E.|
+|         . o=o+ o|
+|        S o .B.. |
+|         .  o.   |
+|           . ..o |
+|           .o.+  |
+|          ....   |
++-----------------+
+</code></pre>
+
+<ul>
+<li>  Authorize the key for a connection from localhost to localhost with
+the current user :</li>
+</ul>
+
+
+
+<pre><code>snoop@ubuntu:~$ ssh-copy-id snoop@localhost
+# should return:
+# The authenticity of host 'localhost (127.0.0.1)' can't be established. ECDSA key fingerprint is 75:a7:59:88:34:fc:34:ce:82:f3:4a:3b:d9:0f:4b:e3. 
+Are you sure you want to continue connecting (yes/no)? yes /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys 
+snoop@localhost's password: 
+Number of key(s) added: 1
+Now try logging into the machine, with:   "ssh 'snoop@localhost'" and check to make sure that only the key(s) you wanted were added.
+</code></pre>
+
+<ul>
+<li>  Check the connection, the following command should not ask for any
+password and return a prompt directly :</li>
+</ul>
+
+
+
+<pre><code>snoop@ubuntu:~$ ssh localhost 
+# should return:
+# Welcome to Ubuntu Trusty Tahr (development branch) (GNU/Linux 3.13.0-23-generic x86_64)
+Documentation:  https://help.ubuntu.com/
+</code></pre>
+
+<p>Then exit from the SSH connection :</p>
+
+<pre><code>snoop@ubuntu:~$ exit 
+logout Connection to localhost closed.
+</code></pre>
+
+<p>\
+<strong>Set the Spark environnement</strong></p>
+
+<p>Copy the template from conf/spark-env.sh.template to conf/spark-env.sh :</p>
+
+<pre><code>snoop@ubuntu:~$ cd spark
+snoop@ubuntu:~/spark$ cp conf/spark-env.sh.template conf/spark-env.sh
+</code></pre>
+
+<p>And set the number of workers at 3 with the enviroment variable
+<code>SPARK_WORKER_INSTANCES</code> :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ echo "export SPARK_WORKER_INSTANCES=3" &gt;&gt; ./conf/spark-env.sh
+</code></pre>
+
+<p><strong>Set the /etc/hosts</strong></p>
+
+<p>The workers and the master communicate through the network and require a
+valid DNS entries. In standalone mode, a DNS server is not required and
+these entries can be set manually in the /etc/hosts file.</p>
+
+<p>Run <code>hostname</code> command to be sure :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ hostname
+# should return:
+# ubuntu
+</code></pre>
+
+<p>Check your IP address on eth0 (assigned by DHCP in default
+configuration) :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ ifconfig | perl -nle'/dr:(\S+)/ &amp;&amp; print $1' | head -n 1
+# should return:
+# 192.168.67.190
+</code></pre>
+
+<p>Then edit your <code>/etc/hosts</code> to look like the following (you can remove
+127.0.1.1 and IPv6 sections) :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ cat /etc/hosts 
+127.0.0.1   localhost 
+192.168.67.190  ubuntu
+</code></pre>
+
+<p><em>NOTE</em>: the important point here is that the hostname (ubuntu) <strong>must</strong>
+be bound to the external IP (192.168.67.190)</p>
+
+<p><strong>Set the log4j logger</strong></p>
+
+<p>We need to redirect the logs to a file instead of the console (displayed
+in the shell), be careful to set your path for the key
+<code>log4j.appender.FILE.File</code> :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ cp conf/log4j.properties.template conf/log4j.properties
+snoop@ubuntu:~/spark$ vim conf/log4j.properties
+# Initialize root logger
+log4j.rootLogger=INFO, FILE
+log4j.rootCategory=INFO, FILE
+
+# Set the appender named FILE to be a File appender
+log4j.appender.FILE=org.apache.log4j.FileAppender
+
+# Change the path to where you want the log file to reside
+log4j.appender.FILE.File=/home/snoop/spark/logs/SparkOut.log
+
+# Prettify output a bit
+log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.FILE.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n
+
+Settings to quiet third party logs that are too verbose log4j.logger.org.eclipse.jetty=WARN log4j.logger.org.apache.spark.repl.SparkIMainexprTyper=INFO log4j.logger.org.apache.spark.repl.SparkILoopSparkILoopInterpreter=INFO
+</code></pre>
+
+<h3>
+<a name="start-the-master" class="anchor" href="#start-the-master"><span class="octicon octicon-link"></span></a>Start the master</h3>
+
+<p>Use the <code>start-master.sh</code> script :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ ./sbin/start-master.sh  
+# should return:
+# starting org.apache.spark.deploy.master.Master, logging to /home/snoop/spark/sbin/../logs/spark-snoop-org.apache.spark.deploy.master.Master-1-ubuntu.out
+</code></pre>
+
+<p>Check the process with <code>jps</code> :</p>
+
+<pre><code>$ jps 
+# should return:
+# 40334 Master 
+  40322 Jps
+</code></pre>
+
+<p>Check the master web UI on your browser : <a href="#">http://localhost:8080</a>
+<img src="https://raw.githubusercontent.com/bbouille/start-spark/master/src/spark-master-start.png" alt=""></p>
+
+<h3>
+<a name="start-the-3-slaves" class="anchor" href="#start-the-3-slaves"><span class="octicon octicon-link"></span></a>Start the 3 slaves</h3>
+
+<p>Use the <code>start-slave.sh</code> script :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ ./sbin/start-slaves.sh -h spark://ubuntu:7077
+# should return:
+# localhost: starting org.apache.spark.deploy.worker.Worker, logging to /home/snoop/spark/sbin/../logs/spark-snoop-org.apache.spark.deploy.worker.Worker-1-ubuntu.out localhost: starting org.apache.spark.deploy.worker.Worker, logging to /home/snoop/spark/sbin/../logs/spark-snoop-org.apache.spark.deploy.worker.Worker-2-ubuntu.out localhost: starting org.apache.spark.deploy.worker.Worker, logging to /home/snoop/spark/sbin/../logs/spark-snoop-org.apache.spark.deploy.worker.Worker-3-ubuntu.out
+</code></pre>
+
+<p>Check the process with <code>jps</code> :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ jps
+# should return:
+# 41376 Jps 
+40334 Master 
+41297 Worker 
+41058 Worker 
+40831 Worker
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/bbouille/start-spark/master/src/spark-start.png" alt=""></p>
+
+<h3>
+<a name="startstop-the-master-and-the-workers-in-one-shoot" class="anchor" href="#startstop-the-master-and-the-workers-in-one-shoot"><span class="octicon octicon-link"></span></a>Start/stop the master and the workers in one shoot</h3>
+
+<p>Stop the master and the workers:</p>
+
+<pre><code>snoop@ubuntu:~/spark$ ./sbin/stop-all.sh
+</code></pre>
+
+<p>\
+Start again :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ ./sbin/start-all.sh
+</code></pre>
+
+<h2>
+<a name="playing-with-spark-shell" class="anchor" href="#playing-with-spark-shell"><span class="octicon octicon-link"></span></a>Playing with Spark (shell)</h2>
+
+<p>Finally we reach the intersting part ! Welcome to Spark and enjoy the
+journey :)</p>
+
+<h3>
+<a name="fire-up-the-shell" class="anchor" href="#fire-up-the-shell"><span class="octicon octicon-link"></span></a>Fire up the shell</h3>
+
+<p>Time to run the console against the cluster :</p>
+
+<pre><code>snoop@ubuntu:~/spark$ MASTER=spark://ubuntu:7077 ./bin/spark-shell
+</code></pre>
+
+<p>Et voilà !</p>
+
+<p>Spark up and ready at home for interactive commande (read <em>Scala
+commandes</em>) :</p>
+
+<p><img src="https://raw.githubusercontent.com/bbouille/start-spark/master/src/spark-shell-standalone.png" alt=""></p>
+
+<h3>
+<a name="hello-spark" class="anchor" href="#hello-spark"><span class="octicon octicon-link"></span></a>Hello Spark</h3>
+
+<p>A quick implementation of Pi approximation suggested by <a href="https://github.com/mbonaci/mbo-spark">mbonaci</a> is a
+good example. Write the following code in the spark console :</p>
+
+<pre><code>/* throwing darts and examining coordinates */
+val NUM_SAMPLES = 100000
+val count = sc.parallelize(1 to NUM_SAMPLES).map{i =&gt;
+  val x = Math.random * 2 - 1
+  val y = Math.random * 2 - 1
+  if (x * x + y * y &lt; 1) 1.0 else 0.0
+}.reduce(_ + _)
+
+println("Pi is roughly " + 4 * count / NUM_SAMPLES)
+</code></pre>
+
+<p>And hit ‘enter’ to see the result :</p>
+
+<p><img src="https://raw.githubusercontent.com/bbouille/start-spark/master/src/spark-pi.png" alt=""></p>
+
+<p>You can now use the Spark Context and test some code in standalone mode.</p>
+
+<p>The next article will focus on application developpement giving details
+on code writing with Eclipse, build with sbt, submission to this
+standalone cluster.</p>
+
+<p>Thanks for reading.</p>
+
+<h1>
+<a name="reference" class="anchor" href="#reference"><span class="octicon octicon-link"></span></a>Reference</h1>
+
+<p>The tutorial was (greatly) inspired by <a href="https://github.com/mbonaci/mbo-spark">mbonaci</a>'s exploration on
+version 0.9.0. Thanks for sharing.</p>
+      </section>
     </div>
     <footer>
-      <div class="owner">
-      <p><a href="https://github.com/bbouille" class="avatar"><img src="https://avatars2.githubusercontent.com/u/7263924?v=2&amp;s=60" width="48" height="48"></a> <a href="https://github.com/bbouille">bbouille</a> maintains <a href="https://github.com/bbouille/start-spark">Start-spark</a></p>
-
-
-      </div>
-      <div class="creds">
-        <small>This page generated using <a href="http://pages.github.com/">GitHub Pages</a><br>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
-      </div>
+      <p>Project maintained by <a href="https://github.com/bbouille">bbouille</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
     </footer>
-  </div>
-  <div class="current-section">
-    <a href="#top">Scroll to top</a>
-    <a href="https://github.com/bbouille/start-spark/tarball/master" class="tar">tar</a><a href="https://github.com/bbouille/start-spark/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
-    <p class="name"></p>
-  </div>
-
-  
-</body>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
 </html>
